@@ -1,0 +1,498 @@
+import dash 
+from dash import ctx
+import dash_bootstrap_components as dbc
+import dash_html_components as html
+import dash_core_components as dcc
+from dash.dependencies import Input, Output, State
+from dash_table import DataTable
+from dash_canvas import DashCanvas
+import dash_daq as daq
+
+import plotly
+import plotly.express as px
+
+import plotly.io as pio
+import plotly.graph_objs as go
+
+import pandas as pd
+
+import json
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - LAYOUT - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+website = dash.Dash(__name__,external_stylesheets=[dbc.themes.SOLAR],
+                    meta_tags=[{"name":"viewport","content":"width=device-width, initial-scale=1.0"}],
+                   suppress_callback_exceptions=True)
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+}
+
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+content = html.Div(id="page-content", children=[], style=CONTENT_STYLE)
+
+sidebar = html.Div(
+    [
+        html.H2("Number recognition program", className="display-4",style={'textAlign':'center'}),
+        html.Hr(),
+        html.P(
+            "EFMat final project", className="side"
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("Description", href="/", active="exact"),
+                dbc.NavLink("Statistics", href="/page-1", active="exact"),
+                dbc.NavLink("Canvas board", href="/page-2", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+
+)
+
+
+website.layout=html.Div([
+    dbc.Button("Success",color="success", className="mr-1"),
+    dbc.Row(dbc.Col(html.Title("Number recognition project")
+    ),),
+    dcc.Location(id="url"),
+    sidebar,
+    content    
+    ])
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - NRU - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+columns=["width","height","path"]
+
+allow=["number"]
+
+NRU=dbc.Container([
+    DataTable(id="drawn_table",columns=[{"name":i,"id":i}for i in columns])   
+    
+])
+
+class NRU():
+    def __int__(self, number, pre_drawn, user_drawn, entry):
+        self.number=number
+        self.pre_drawn=pre_drawn
+        self.user_drawn=user_drawn
+        self.entry=entry
+    
+    def comparison(self,pre_drawn,user_drawn):
+        pass
+    
+    def frequency(self, number, entry):
+        pass
+        
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - CARDS - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+card1=dbc.Container([
+    dbc.CardHeader(   
+    dbc.Button("Objective", id="objBtt",style={"color":"goldenrod"},className="text-dark btn-block align-middle w-100")
+    ),
+    dbc.Collapse(
+    dbc.Card([
+    dbc.CardBody([
+        html.P("""This is the final project of UnB second semester EFMat course coordenated
+                    by teacher Lucas Loureiro. Thus, subjects such as python Classes,
+                    web development, and html, as well as the ones theached before,
+                    were applied on this website. """,className="card-text")
+        ],style={"color":"goldenrod"}),
+    dbc.CardImg(src="https://lh3.googleusercontent.com/a-/AOh14GhKKmrBlYU4jgK88G7fFV3XLuyNgI4Le1Okj9Ve=s75-c",bottom=True)])
+        ,id="objAns",is_open=False)])
+
+
+card2=dbc.Container([
+    dbc.CardHeader( 
+    dbc.Button("Program explanation", id="pgmBtt",style={"color":"goldenrod"},className="text-dark btn-block align-middle w-100")),
+    dbc.Collapse(
+        dbc.Card([
+    dbc.CardBody([
+        html.P("""The general idea of the NRP (Number Recognition Program) is to possiblity the identification of a number drawn on a board. Hence, after the user drawn
+                    a number on the board, the program will collect pixels that were painted and reshape them to a list with the intention of building a coordinate system. From that,
+                    a comparison of the distance (10% of divergence is the initial tolerance) from predefined shapes of numbers will be done. Once the board was divided in four different quadrants, an 
+                    analysis of the shape of the number writen on each quadrant become more precise, allowing more reliable results. According to the precision percentage,
+                    a result will be declared. If the precision percentage is too low, tolerance percentage will be increased in 5% until a result above 80% be founded.\n\n
+                    It is worth mentioning that since the program is based on pre defined parameters, it does not configure an AI.""",
+               className="card-text")
+        
+    ],style={"color":"goldenrod"}),
+        dbc.CardImg(src="https://th.bing.com/th/id/OIP.hmcZgKUKYsC_5rQB1SmY_AHaE7?pid=ImgDet&rs=1",
+                    bottom=True)]),id="pgmAns",is_open=False)])
+
+
+card3=dbc.Container([
+    dbc.CardHeader(
+    dbc.Button("Instructions",id="intBtt",style={"color":"goldenrod"},className="text-dark btn-block align-middle w-100")),
+    dbc.Collapse(
+    dbc.Card([
+    dbc.CardBody([
+        html.P("""First, click on 'Canvas board' in the sidebar. Second, drawn a single number number within the yellow image on the center of the page.
+                    Finished the drawing, click on 'Analise' button below the board. If some mistake was done or an improvement on the drawing should 
+                    be done, click on 'Clear' button below the board. Otherwise, just follow the previous step.\n\n
+                    Finally, after clicking on 'Analise' button, the program will check your drawing and give you a result. 
+                    Then, click on 'Right' or 'Wrong' button below the result. If you want to make another drawn, just click on the 'Clear' button to rerun the program.\n\n
+                    You may like to check the performace of the program. For this reason, the "Statistics" button on the sidebar was created. There you will find the general 
+                    precision of the program, individual precision for each number, and most frequent numbers. You just need to choose the number on the dropdown bar to display the graphs.
+                    """,className="card-text")        
+    ],style={"color":"goldenrod"}),dbc.CardImg(src="https://cdn0.iconfinder.com/data/icons/logistic-lineal-color/512/checklist-512.png",
+                                               bottom=True)]),
+        id="intAns",is_open=False)])
+
+cards=dbc.Container([
+                    dbc.Row([
+                        dbc.Col(card1,width={"size":3,"offsett":0},xs=12,sm=12,md=12,lg=3,xl=3
+                        ),                        
+
+                        dbc.Col(card2,width={"size":4,"offsett":0},xs=12,sm=12,md=12,lg=4,xl=4
+                        ),
+                        
+                        dbc.Col(card3,width={"size":4,"offsett":0},xs=12,sm=12,md=12,lg=4,xl=4
+                        )
+                    ],justify="around")                    
+                ])
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - GRAPHS - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+df1=pd.read_csv(r"C:\Users\adm\Documents\Jupyter\program_precision")
+df2=pd.read_csv(r"C:\Users\adm\Documents\Jupyter\individual_precision")
+df3=pd.read_csv(r"C:\Users\adm\Documents\Jupyter\number_frequence")
+
+graph1=dbc.Container([
+        dbc.Button(html.H1("General program precision", className="text-dark mb-4"),
+                                className="badge-pill", style={"color":"goldenrod"}),
+        dcc.Graph(id="idg1",figure={})
+                    ])
+                     
+graph2=dbc.Container([
+        dbc.Button(html.H1("Individual number precision", className="text-dark mb-4"),
+                                className="badge-pill", style={"color":"goldenrod"}),
+        dcc.Graph(id="idg2",figure={})
+        
+                    ])
+
+graph3=dbc.Container([
+        dbc.Button(html.H1("General number frequency", className="text-dark mb-4"),
+                                className="badge-pill", style={"color":"goldenrod"}),
+        dcc.Graph(id="idg3",figure={})        
+                    ])
+
+graphs=dbc.Container([        
+    
+        dbc.Row([
+            dbc.Col([graph1],width={"size":4},xs=12,sm=12,md=12,lg=4,xl=4),
+            dbc.Col([graph2],width={"size":4},xs=12,sm=12,md=12,lg=4,xl=4),
+            dbc.Col([graph3],width={"size":4},xs=12,sm=12,md=12,lg=4,xl=4)
+        ],justify="around")
+])
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - CANVAS - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+file="assets\DrawingBackGround.PNG"
+
+canvas=html.Div([
+    dbc.Row([
+        dbc.Col([
+            DashCanvas(id='canvas_board',
+               goButtonTitle ="Analize",
+               width=150,height=400,
+               hide_buttons=['line',"rectangle","pan",'zoom',"select","redo"],
+               lineWidth=5,
+               lineColor="#073642",
+               filename=file
+                      ),
+            DataTable(id="drawn_table",columns=[{"name":i,"id":i} for i in columns])
+        ],width={"size":5,"offset":5})
+        ]),
+    
+    dbc.Row([
+        html.Hr(),
+        dbc.Col([html.H5("Choose the number drawn:"),
+        dcc.Dropdown(
+            id="dpdn",
+            multi=False,
+            value=0,
+            options=[{"label":x,"value":x}for x in range(0,10)]),
+                dbc.Button("Submit",id="sbm_btt",style={"color":"goldenrod"},
+                           className="text-dark btn-block")],width={"size":3,"offset":0}
+                )
+],justify="center"),   
+    
+    dbc.Row([
+        html.Hr(),
+        dbc.Col([html.H5("Is the program's answer correct?",className="text-center")],width={"size":2}),
+        dbc.Col([dbc.Button("YES",id="y_btt",style={"color":"goldenrod"},className="text-dark btn-block")],width={"size":1}),
+        dbc.Col([dbc.Button("NO",id="n_btt",style={"color":"goldenrod"},className="text-dark btn-block")],width={"size":1,"offset":0})
+        
+    ],justify="center")
+    
+])    
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - CALLBACKS - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - COORDENATION - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+@website.callback(
+    Output("page-content", "children"),
+    [Input("url", "pathname")]
+)
+
+def page_content(pathname):
+    if pathname == "/":
+        return [
+                html.H1('PROJECT DESCRIPTION',
+                        style={'textAlign':'center',"color":"goldenrod"}, className="mb-4"),
+                cards
+                
+                ]
+    elif pathname == "/page-1":
+        return [
+                html.H1('Program statistics',
+                        style={'textAlign':'center',"color":"goldenrod"},className="mb-4"),
+                graphs
+                
+                ]
+    elif pathname == "/page-2":
+        return [
+
+                html.H1('CANVAS BOARD',
+                style={'textAlign':'center',"color":"goldenrod"},className="mb-4"),
+
+                html.H5("""Drawn the number inside the canvas.
+                    Make sure to drawn the number on the center and as big as possible.""",
+                    style={'textAlign':'center'}), canvas        
+                ]
+    
+    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - CARDS COLAPSE - - - - - - - - - - - - - - - - - - - - - - - - - - #     
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+@website.callback(Output("objAns","is_open"),
+                  [Input("objBtt","n_clicks")],
+                  [State("objAns","is_open")],
+                 )
+def toggle_collapse(n,is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@website.callback(Output("pgmAns","is_open"),
+                  [Input("pgmBtt","n_clicks")],
+                  [State("pgmAns","is_open")],
+                 )
+def toggle_collapse(n,is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@website.callback(Output("intAns","is_open"),
+                  [Input("intBtt","n_clicks")],
+                  [State("intAns","is_open")],
+                 )
+def toggle_collapse(n,is_open):
+    if n:
+        return not is_open
+    return is_open
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - GRAPHS - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+"""
+@website.callback(Output("idg3","children"),
+                 [Intput("result","n_clicks"),Input("number","text")])
+
+def update_graph(clicks):
+    if clicks:
+        df
+"""
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - DRAWN DATA - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+@website.callback(Output("drawn_table","data"),Input("canvas_board", "json_data"))
+def drawn_data(string):
+    if string:
+        data=json.loads(string)
+        
+    else:
+        raise PreventUpdate
+    return data['objects'][1:]
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - CANVAS RES - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+@website.callback(
+    Output("idg1","figure"),
+    [Input("y_btt","n_clicks"),
+     Input("n_btt","n_clicks")],
+    prevent_initial_call=True
+)
+def trig1 (n1,n2):
+    
+    triggered_id=ctx.triggered_id
+    
+    print(type(triggered_id))
+    
+    if triggered_id=="y_btt":
+        df1.loc[0,"Final"]= df1.loc[0,"Final"]+1
+        df1[0,"Precision"]=df1[0,"Final"]/sum(df1["Final"])
+        df1[1,"Precision"]=df1[1,"Final"]/sum(df1["Final"])
+        bar1=px.bar(data_frame=df1,
+           x="Result",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"],
+           )
+        bar1.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+        
+        return bar1
+    
+    elif triggered_id=="n_btt":
+        df1.loc[1,"Final"]= df1.loc[1,"Final"]+1
+        df1[0,"Precision"]=df1[0,"Final"]/sum(df1["Final"])
+        df1[1,"Precision"]=df1[1,"Final"]/sum(df1["Final"])
+        bar1=px.bar(data_frame=df1,
+           x="Result",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"],
+           )
+        bar1.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+        return bar1
+    
+    else:
+        df1[0,"Precision"]=df1[0,"Final"]/sum(df1["Final"])
+        df1[1,"Precision"]=df1[1,"Final"]/sum(df1["Final"])
+        bar1=px.bar(data_frame=df1,
+           x="Result",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"],
+           )
+        bar1.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+        
+        return bar1
+
+    
+@website.callback(
+    Output("idg2","figure"),
+    [Input("y_btt","n_clicks"),Input("n_btt","n_clicks")],
+    [State("dpdn","value")],
+    prevent_initial_call=True
+)
+def trig2 (yb,nb,value):
+
+    button_clicked = ctx.triggered_id
+    print(button_clicked)
+    
+    if not button_clicked:
+        
+        df2.loc[value,"Precision"]=df2.loc[value,"Right"]/df2.loc[value,"Total"]
+        
+        bar2=px.bar(data_frame=df2,
+           x="Numbers",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"], labels={"Precision":"Precision in %"}
+           )
+        bar2.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+
+        
+        return bar2
+    
+    elif button_clicked=="y_btt":
+        
+        df2.loc[value,"Total"]=df2.loc[value,"Total"]+1
+        df2.loc[value,"Right"]=df2.loc[value,"Right"]+1
+        df2.loc[value,"Precision"]=df2.loc[value,"Right"]/df2.loc[value,"Total"]
+        
+        bar2=px.bar(data_frame=df2,
+           x="Numbers",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"], labels={"Precision":"Precision in %"}
+           )
+        bar2.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+
+        return bar2
+    
+    elif button_clicked=="n_btt":
+        
+        df2.loc[value,"Total"]=df2.loc[value,"Total"]+1
+        df2.loc[value,"Precision"]=df2.loc[value,"Right"]/df2.loc[value,"Total"]
+        
+        bar2=px.bar(data_frame=df2,
+           x="Numbers",y="Precision",
+            orientation="v", color_discrete_sequence=["goldenrod"], labels={"Precision":"Precision in %"}
+           )
+        bar2.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+
+        return bar2
+    
+@website.callback(
+    Output("idg3","figure"),
+    [Input("sbm_btt","n_clicks")],
+    [State("dpdn","value")],
+    prevent_initial_call=True
+)
+def trig3 (n,value):
+    df3.loc[value,"Frequence"]= df3.loc[value,"Frequence"]+1
+    bar3=px.bar(data_frame=df3,
+       x="Numbers",y="Frequence",
+        orientation="v", color_discrete_sequence=["goldenrod"], labels={"Frequence":"Frequency in %"}
+       )
+    bar3.update_layout(paper_bgcolor="#002b36",plot_bgcolor="#002b36")
+
+    return bar3
+
+
+# Não está podendo ativar o debug, caso contrário, a página cai. O flask considera o site como "de produção".
+# O código abaixo serviria para corrigir isso e permitir o debug=True.
+website.run_server(debug=False)
+
+
